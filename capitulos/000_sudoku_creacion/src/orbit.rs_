@@ -1,0 +1,55 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+use libfinal::color::{stroke1, no_fill};
+use libfinal::engine::{Parametros, Engine};
+use libfinal::shapes::{stroke_weight, ellipse};
+
+
+pub type SingleLink = Option<Rc<RefCell<Orbit>>>;
+
+#[derive(Clone)]
+pub struct Orbit {
+    x: f32,
+    y: f32,
+    r: f32,
+    pub parent: SingleLink,
+    pub child: SingleLink,
+    speed: f32,
+    angle: f32,
+}
+
+impl Orbit {
+    pub fn new3(x: f32, y: f32, r: f32) -> Orbit {
+        Orbit::new4(x, y, r, None)
+    }
+    pub fn new4(x: f32, y: f32, r: f32, p: SingleLink) -> Orbit {
+        Orbit {
+            x,
+            y,
+            r,
+            parent: p,
+            child: None,
+            speed: 0.1,
+            angle: 0.0,
+        }
+    }
+
+    pub fn add_child(&mut self) {
+        let newr = self.r * 0.5;
+        let newx = self.x + self.r + newr;
+        let newy = self.y;
+        let child = Some(Rc::new(RefCell::new(self)));
+    }
+
+    pub fn show(&mut self, engine: &mut Engine) {
+        stroke1(255.0, &mut engine.param);
+        stroke_weight(2.0, &mut engine.param);
+        no_fill(&mut engine.param);
+        ellipse(&mut engine.canvas.as_mut().unwrap(),
+                &mut engine.param,
+                self.x,
+                self.y,
+                self.r * 2.0,
+                self.r * 2.0);
+    }
+}

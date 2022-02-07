@@ -1,0 +1,107 @@
+use std::rc::Rc;
+use std::cell::RefCell;
+
+use libfinal::p5::vector::Vector2;
+use libfinal::color::stroke1;
+use libfinal::engine::Engine;
+use libfinal::shapes::{stroke_weight, line};
+use libfinal::matem::{random, mapa, noise, noise2};
+use libfinal::constantes::PI;
+
+#[derive(Clone)]
+pub struct Segment {
+    a: Vector2,
+    len: f32,
+    angle: f32,
+    self_angle: f32,
+
+    xoff: f32,
+
+    pub parent: Option<Rc<RefCell<Segment>>>,
+    pub child: Option<Rc<RefCell<Segment>>>,
+
+    b: Vector2,
+
+}
+
+impl Segment {
+    pub fn new3(parent: Option<Rc<RefCell<Segment>>>, len: f32, angle: f32, t: f32) -> Segment {
+        //let a = Vector2::new(parent.clone().unwrap().b.x, parent.clone().unwrap().b.y);
+        //let a = parent.clone().unwrap().b;
+//        let a1 = parent.clone();
+//        let a2 = a1.unwrap();
+//        let a3 = a2.borrow();
+//        let a = a3.b;
+        let a = parent.clone().unwrap().borrow_mut().b;
+        Segment {
+            a,
+            len,
+            angle,
+            self_angle: angle,
+            xoff: random(1000.0),
+
+            parent,
+            child: None,
+
+            b: Segment::calculate_b(a, len, angle),
+
+        }
+    }
+
+    pub fn new4(x: f32, y: f32, len: f32, angle: f32, t: f32) -> Segment {
+        let a = Vector2::new(x, y);
+        Segment {
+            a,
+            len,
+            angle,
+            self_angle: angle,
+            xoff: random(1000.0),
+
+            parent: None,
+            child: None,
+
+            b: Segment::calculate_b(a, len, angle),
+
+        }
+    }
+
+    pub fn wiggle(&mut self) {
+        let maxangle = 1.0;
+        let minangle = -1.0;
+        //  / 10.0 lo pongo yo
+        self.self_angle = mapa(noise(self.xoff) / 10.0, -1.0, 1.0, maxangle, minangle);
+        self.xoff += 0.03;
+        //self.self_angle += 0.001;
+    }
+
+    pub fn update(&mut self) {
+        self.angle = self.self_angle;
+        match &self.parent {
+            Some(s) => {
+                self.a = self.parent.clone().unwrap().borrow().b;
+
+                self.angle += self.parent.clone().unwrap().borrow().angle;
+            }
+            None => {
+                self.angle += -PI / 2.0;
+            }
+        }
+
+
+        self.b = Segment::calculate_b(self.a, self.len, self.angle);
+    }
+
+    pub fn calculate_b(a: Vector2, len: f32, angle: f32) -> Vector2 {
+        let dx = len * angle.cos();
+        let dy = len * angle.sin();
+
+
+        Vector2::new(a.x + dx, a.y + dy)
+    }
+
+    pub fn show(&mut self, engine: &mut Engine) {
+        stroke1(255.0, &mut engine.param);
+        stroke_weight(4.0, &mut engine.param);
+        line(engine.canvas.as_mut().unwrap(), &mut engine.param, self.a.x, self.a.y, self.b.x, self.b.y);
+    }
+}
