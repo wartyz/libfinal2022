@@ -1,0 +1,112 @@
+use rand::Rng;
+
+//#[derive(Copy, Clone)]
+//pub struct P5Vector {
+//    pub x: f32,
+//    pub y: f32,
+//    pub z: f32,
+//}
+//
+//impl P5Vector {
+//    pub fn new(x: f32, y: f32, z: f32) -> P5Vector {
+//        let v = P5Vector {
+//            x: x,
+//            y: y,
+//            z: z,
+//        };
+//        v
+//    }
+//
+//    pub fn sub(a: P5Vector, b: P5Vector) -> P5Vector {
+//        P5Vector {
+//            x: a.x - b.x,
+//            y: a.y - b.y,
+//            z: a.z - b.z,
+//        }
+//    }
+//
+//    pub fn add(a: P5Vector, b: P5Vector) -> P5Vector {
+//        P5Vector {
+//            x: a.x + b.x,
+//            y: a.y + b.y,
+//            z: a.z + b.z,
+//        }
+//    }
+//
+//    pub fn mult(&mut self, factor: f32) {
+//        self.x = self.x * factor;
+//        self.y = self.y * factor;
+//        self.z = self.z * factor;
+//    }
+//
+//    // Angulo en radianes provisionalmente
+//    pub fn rotate(&mut self, angulo: f32) {
+////        if modoAngulo == GRADOS {
+////        angulo = radians(angulo)
+////    }
+//
+//        let x1 = self.x;
+//        self.x = self.x * angulo.cos() - self.y * angulo.sin();
+//        self.y = x1 * angulo.sin() + self.y * angulo.cos();
+//    }
+//}
+
+#[derive(Debug, Clone)]
+pub struct Vector2 {
+    pub x: f32,
+    pub y: f32,
+}
+
+impl Vector2 {
+    pub fn new(x: f32, y: f32) -> Vector2 {
+        Vector2 {
+            x,
+            y,
+        }
+    }
+}
+//use ggez::nalgebra as na;
+//use na::*;
+
+// Devuelve un vector 2D de un angulo en radianes
+pub fn from_angle(ang: f32) -> Vector2 {
+    Vector2::new(ang.cos(), ang.sin())
+}
+
+pub fn random2d() -> Vector2 {
+    let mut rng = rand::thread_rng();
+    let x: f32 = rng.gen_range(-1.0, 1.0);
+    let y: f32 = rng.gen_range(-1.0, 1.0);
+    //println!("En p5_vector random2d x= {:?}", x);
+    Vector2::new(x, y)
+}
+
+// Multiplica un vector por un escalar
+pub fn mult(vec: Vector2, esc: f32) -> Vector2 {
+    Vector2::new(vec.x * esc, vec.y * esc)
+}
+
+pub fn add(a: &Vector2, b: &Vector2) -> Vector2 {
+    Vector2::new(a.x + b.x, a.y + b.y)
+}
+
+pub fn sub(a: Vector2, b: Vector2) -> Vector2 {
+    Vector2::new(a.x - b.x, a.y - b.y)
+}
+
+// Distancia entre dos vectores
+pub fn dist(a: &Vector2, b: &Vector2) -> f32 {
+    //let pa = Point2::new(a.x, a.y);
+    //let pb = Point2::new(b.x, b.y);
+
+    let x = a.x - b.x;
+    let y = a.y - b.y;
+    ((x * x) + (y * y)).sqrt()
+}
+
+// Divide un vector por un numero
+pub fn div(v: &Vector2, b: f32) -> Vector2 {
+    Vector2::new(v.x / b, v.y / b)
+}
+
+

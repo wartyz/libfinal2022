@@ -1,0 +1,16 @@
+[package]
+name = "libfinal"
+version = "0.1.0"
+authors = ["wartyz <zwenderk@hotmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+nalgebra = "0.21.1"
+rand = "0.7.2"
+#image = "0.23.6"
+perlin_noise = "1.0.1"
+rodio = "0.11.0"
+raylib = { version = "3.7", git = "https://github.com/deltaphc/raylib-rs", branch = "master" }
+

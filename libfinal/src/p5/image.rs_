@@ -1,0 +1,130 @@
+/*
+    createImage()
+    saveCanvas()
+    saveFrames()
+    p5.Image
+
+Loading & Displaying
+
+    loadImage()
+    image()
+    tint()
+    noTint()
+    imageMode()
+
+Pixels
+
+    pixels
+    blend()
+    copy()
+    filter()
+    get()
+    loadPixels()
+    set()
+    updatePixels()
+
+*/
+
+#[derive(Debug, Clone)]
+pub struct P5Image {
+    pub image: GameResult<Image>,
+    pub image_pixels: Vec<u8>,
+    pub image_width: usize,
+    pub image_height: usize,
+}
+
+
+impl P5Image {
+    // Carga fichero y rellena image, image_pixels, image_width, image_height
+    pub fn new(ctx: &mut Context, path: String) -> P5Image {
+        let image = Image::new(ctx, path);
+        let image_clone = image.clone().unwrap();
+        let w = image_clone.width() as usize;
+        let h = image_clone.height() as usize;
+        println!("En p5::P5Image::image::new w = {:?}, h = {:?}", w, h);
+
+        let i1 = image.clone();
+        let image_pixels = i1.unwrap().to_rgba8(ctx).unwrap();
+
+
+        P5Image {
+            image: image,
+            image_pixels: image_pixels, // de p5_image
+            image_width: w, // de p5_image
+            image_height: h, // de p5_image
+        }
+    }
+
+    // Pasa a image_pixels[] lo cargado , no le veo el sentido y lo dejo vacio
+    pub fn load_image(&mut self, ctx: &mut Context) {
+
+//        let i1 = self.image.clone();
+//        self.image_pixels = i1.unwrap().to_rgba8(ctx).unwrap();
+    }
+
+    // Presenta en pantalla el objeto image en x,y
+    pub fn image(&mut self, ctx: &mut Context, x: f32, y: f32) {
+        let image = self.image.clone();
+
+        //let color = Color { r: 0.0, g: 0.0, b: 0.0, a: 0.0 };
+        let dest_point = Point2::new(x, y);
+        //let rec = ggez::graphics::Rect::new(200.0, 300.0, 200.0, 100.0);
+        //ggez::graphics::set_screen_coordinates(ctx, rec);
+        //ggez::graphics::draw(ctx, &image.unwrap(), DrawParam::default());
+        ggez::graphics::draw(ctx, &image.unwrap(), (dest_point, ));
+    }
+
+
+    // Devuelve un objeto P5Image con bits a 0 y image_pixels vacio
+    pub fn create_image(ctx: &mut Context,
+                        width: usize,
+                        height: usize,
+                        color_mode: ColorMode) -> P5Image {
+        let c = vec![0u8; width * 4 * height];
+        let image = Image::from_rgba8(ctx, width as u16, height as u16, &c);
+        P5Image {
+            image: image,
+            image_pixels: vec![], // de p5_image
+            image_width: width, // de p5_image
+            image_height: height, // de p5_image
+        }
+    }
+
+    // Rellena image_pixels con u8 sacados de image
+    pub fn load_pixels(&mut self, ctx: &mut Context) {
+        let i1 = self.image.clone();
+        self.image_pixels = i1.unwrap().to_rgba8(ctx).unwrap();
+        println!("En p5::image::P5Image::load_pixels() tamaño self.image_pixels = {:?}",
+                 self.image_pixels.len());
+//        let num_pixels = self.image_width * self.image_height;
+//
+//        for p in 0..num_pixels {
+//            let (r, g, b, a) = (image_pixels[0 + 4 * p], image_pixels[1 + 4 * p],
+//                                image_pixels[2 + 4 * p], image_pixels[3 + 4 * p]);
+//            let col = Color::new(r as f32 / 255.0,
+//                                 g as f32 / 255.0,
+//                                 b as f32 / 255.0,
+//                                 a as f32 / 255.0);
+//            self.image_pixels.push(col);
+//        }
+    }
+
+    // Rellena image con los bits de image_pixels
+    pub fn update_pixels(&mut self, ctx: &mut Context) {
+        println!("En update_pixels  image_width={:?} ", self.image_width);
+        self.image = ggez::graphics::Image::from_rgba8(ctx,
+                                                       self.image_width as u16,
+                                                       self.image_height as u16,
+                                                       &self.image_pixels);
+    }
+
+    pub fn get(&mut self) -> P5Image {
+        P5Image {
+            image: self.image.clone(),
+            image_pixels: self.image_pixels.clone(),
+            image_width: self.image_width.clone(),
+            image_height: self.image_height.clone(),
+        }
+    }
+}
+
